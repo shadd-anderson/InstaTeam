@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+        <title>InstaTeam</title>
+        <link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'/>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <link rel="stylesheet" href="css/normalize.css"/>
+        <link rel="stylesheet" href="css/site.css"/>
+    </head>
+    <body>
+        <header>
+            <div class="container">
+                <div class="site-header">
+                    <a class="logo" th:href="@{/}">InstaTeam</a>
+                    <a class="new-project button icon-left" th:href="@{/new-project}"><i class="material-icons">add</i> New Project</a>
+                </div>
+            </div>
+        </header>
+        <nav>
+            <ul>
+                <li class="selected"><a th:href="@{/}">Projects</a></li>
+                <li><a th:href="@{/collaborators}">Collaborators</a></li>
+                <li><a th:href="@{/roles}">Roles</a></li>
+            </ul>
+        </nav>
+        <section>
+            <div class="container wrapper">
+                <div class="project-list">
+                    <div class="project" th:each="project: ${projects}">
+                        <h2 th:text="${project.name}"><a th:href="@{/projects/{project.id}}">Website Project</a></h2>
+                        <p th:text="${project.description}">Design and build a custom website</p>
+                        <span th:classappend="${#strings.toLowerCase(project.status)}" class="tag" th:text="${project.status}">Pending</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>

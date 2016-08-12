@@ -1,0 +1,34 @@
+buildscript {
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.0.RELEASE")
+    }
+    repositories {
+        mavenCentral()
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'spring-boot'
+
+configurations {
+    dev
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.springframework:spring-orm:4.3.2.RELEASE'
+    compile 'org.hibernate:hibernate-core:5.2.1.Final'
+    compile 'com.h2database:h2:1.4.192'
+    compile 'org.springframework.boot:spring-boot-starter-thymeleaf:1.4.0.RELEASE'
+    compile 'org.apache.tomcat:tomcat-dbcp:8.0.32'
+    dev 'org.springframework.boot:spring-boot-devtools'
+}
+
+bootRun {
+    // Use Spring Boot DevTool only when we run Gradle bootRun task
+    classpath = sourceSets.main.runtimeClasspath + configurations.dev
+    addResources = true
+}
