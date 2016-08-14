@@ -1,19 +1,25 @@
 package com.InstaTeam.Instant.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 public class Collaborator {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Id
   private Long id;
+
+  @NotNull
+  @Size(min = 1, max = 30)
   private String name;
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.ALL)
   private Role role;
 
   public Collaborator(){}

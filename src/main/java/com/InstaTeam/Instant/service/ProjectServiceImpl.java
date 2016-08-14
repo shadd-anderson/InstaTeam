@@ -20,7 +20,17 @@ public class ProjectServiceImpl implements ProjectService {
   }
 
   @Override
+  public Project findById(Long id) {
+    return projectDAO.findById(id);
+  }
+
+  @Override
   public void save(Project project) {
     projectDAO.save(project);
+  }
+
+  @Override
+  public void delete(Project project) {
+    projectDAO.delete(project);
   }
 }

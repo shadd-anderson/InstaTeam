@@ -6,41 +6,43 @@
         <title>InstaTeam</title>
         <link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'/>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-        <link rel="stylesheet" href="css/normalize.css"/>
-        <link rel="stylesheet" href="css/site.css"/>
+        <link rel="stylesheet" href="/css/normalize.css"/>
+        <link rel="stylesheet" href="/css/site.css"/>
     </head>
     <body>
         <header>
             <div class="container">
                 <div class="site-header">
-                    <a class="logo" href="index.html">InstaTeam</a>
-                    <a class="new-project button icon-left" href="#"><i class="material-icons">add</i> New Project</a>
+                    <a class="logo" th:href="@{/}">InstaTeam</a>
+                    <a class="new-project button icon-left" th:href="@{/new-project}"><i class="material-icons">add</i> New Project</a>
                 </div>
             </div>
         </header>
         <nav>
             <ul>
-                <li><a href="index.html">Projects</a></li>
-                <li><a href="collaborators.html">Collaborators</a></li>
-                <li class="selected"><a href="roles.html">Roles</a></li>
+                <li><a th:href="@{/}">Projects</a></li>
+                <li><a th:href="@{/collaborators}">Collaborators</a></li>
+                <li class="selected"><a th:href="@{/roles}">Roles</a></li>
             </ul>
         </nav>
         <section>
             <div class="container wrapper">
-                <form>
-                    <h2>Manage Roles</h2>
+                <div class="form">
+                    <h2 style="display:inline">Manage Roles</h2>
+                    <h2 th:if="${project != null}" style="display:inline" th:text="| for ${project.name}|"></h2>
                     <div>
                         <ul class="checkbox-list">
-                            <li><span class="primary">Developer</span></li>
-                            <li><span class="primary">Designer</span></li>
-                            <li><span class="primary">QA</span></li>
-                            <li><span class="primary">DevOps</span></li>
-                            <li><span class="primary">Copywriter</span></li>
+                            <li th:each="role: ${roles}"><span class="primary" th:text="${role.name}">Developer</span>
+                                <form th:action="@{|/role/${role.id}/delete|}" method="post" style="display: inline">
+                                    <button class="button delete-button inline-button" type="submit">Delete Role</button></form></li>
                         </ul>
                     </div>
+                </div>
+                <form th:object="${role}" action="/roles/add" method="post">
                     <div class="actions add-new-role">
-                        <input type="text" placeholder="New Role..."/>
-                        <a class="button" href="#">Add</a>
+                        <input type="hidden" th:field="*{id}"/>
+                        <input type="text" th:field="*{name}" placeholder="New Role..."/>
+                        <input type="submit" value="Submit" class="button"/>
                     </div>
                 </form>
             </div>

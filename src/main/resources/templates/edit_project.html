@@ -6,8 +6,8 @@
         <title>InstaTeam</title>
         <link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'/>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-        <link rel="stylesheet" href="css/normalize.css"/>
-        <link rel="stylesheet" href="css/site.css"/>
+        <link rel="stylesheet" href="/css/normalize.css"/>
+        <link rel="stylesheet" href="/css/site.css"/>
     </head>
     <body>
         <header>
@@ -18,55 +18,44 @@
                 </div>
             </div>
         </header>
-        <nav style="padding:10px">
-            <h1 style="color:white">New Project</h1>
+        <nav>
+            <h1 class="title-heading">New Project</h1>
         </nav>
         <section>
             <div class="container wrapper">
-                <form>
+                <form th:object="${project}" th:action="${action}" method="post">
+                    <input type="hidden" th:field="*{id}"/>
                     <div>
                         <label for="project_name"> Project Name:</label>
-                        <input type="text" id="project_name"/>
+                        <input type="text" id="project_name" th:field="*{name}"/>
                     </div>
                     <div>
                         <label for="project_description">Project Description:</label>
-                        <textarea rows="4" name="project_description"></textarea>
+                        <textarea rows="4" id="project_description" th:field="*{description}"></textarea>
                     </div>
                     <div>
                         <label for="project_status">Project Status:</label>
                         <div class="custom-select">
                         <span class="dropdown-arrow"></span>
-                            <select name="project_status">
-                                <option value="active">Active</option>
-                                <option value="archived">Archived</option>
-                                <option value="not_started">Not Started</option>
+                            <select id="project_status" th:field="*{status}">
+                                <option th:value="${T(com.InstaTeam.Instant.model.Project.Status).Active}">Active</option>
+                                <option th:value="${T(com.InstaTeam.Instant.model.Project.Status).Archived}">Archived</option>
+                                <option th:value="${T(com.InstaTeam.Instant.model.Project.Status).Pending}">Pending</option>
                             </select>
                         </div>
                     </div>
                     <div>
-                        <label for="project_roles">Project Roles:</label>
+                        <label>Project Roles:</label>
                         <ul class="checkbox-list">
-                            <li>
-                                <input type="checkbox" name="project_roles" value="Developer"/>
-                                <span class="primary"> Developer</span>
-                            </li>
-                            <li>
-                                <input type="checkbox" name="project_roles" value="Designer"/>
-                                <span class="primary"> Designer</span>
-                            </li>
-                            <li>
-                                <input type="checkbox" name="project_roles" value="QA"/>
-                                <span class="primary"> QA</span>
-                            </li>
-                            <li>
-                                <input type="checkbox" name="project_roles" value="DevOps"/>
-                                <span class="primary"> DevOps</span>
+                            <li th:each="role: ${roles}">
+                                <input type="checkbox" th:field="*{rolesNeeded}" th:id="|project_roles${role.id}|" th:value="${role.id}"/>
+                                <label th:for="|project_roles${role.id}|" class="primary" th:text="${role.name}">Role Name</label>
                             </li>
                         </ul>
                     </div>
                     <div class="actions">
                         <input type="submit" value="Save" class="button"/>
-                        <a href="#" class="button button-secondary">Cancel</a>
+                        <a th:href="${redirect}" class="button button-secondary">Cancel</a>
                     </div>
                 </form>
             </div>

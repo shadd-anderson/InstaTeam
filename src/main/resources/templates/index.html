@@ -29,7 +29,7 @@
             <div class="container wrapper">
                 <div class="project-list">
                     <div class="project" th:each="project: ${projects}">
-                        <h2 th:text="${project.name}"><a th:href="@{/projects/{project.id}}">Website Project</a></h2>
+                        <h2><a th:href="@{|/projects/${project.id}|}" th:text="${project.name}">Website Project</a></h2>
                         <p th:text="${project.description}">Design and build a custom website</p>
                         <span th:classappend="${#strings.toLowerCase(project.status)}" class="tag" th:text="${project.status}">Pending</span>
                     </div>

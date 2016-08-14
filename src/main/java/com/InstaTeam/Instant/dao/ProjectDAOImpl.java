@@ -2,6 +2,7 @@ package com.InstaTeam.Instant.dao;
 
 import com.InstaTeam.Instant.model.Project;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,20 +30,29 @@ public class ProjectDAOImpl implements ProjectDAO {
 
   @Override
   public Project findById(Long id) {
-    return null;
+    Session session = sessionFactory.openSession();
+    Project project = session.get(Project.class, id);
+    Hibernate.initialize(project.getCollaborators());
+    Hibernate.initialize(project.getRolesNeeded());
+    session.close();
+    return project;
   }
 
   @Override
   public void save(Project project) {
     Session session = sessionFactory.openSession();
     session.beginTransaction();
-    session.save(project);
+    session.saveOrUpdate(project);
     session.getTransaction().commit();
     session.close();
   }
 
   @Override
   public void delete(Project project) {
-
+    Session session = sessionFactory.openSession();
+    session.beginTransaction();
+    session.delete(project);
+    session.getTransaction().commit();
+    session.close();
   }
 }
