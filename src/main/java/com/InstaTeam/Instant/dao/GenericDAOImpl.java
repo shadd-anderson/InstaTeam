@@ -10,32 +10,40 @@ import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
+@SuppressWarnings("unchecked")
 @Repository
 public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
   @Autowired
   SessionFactory sessionFactory;
 
+  protected Class<T> classy;
+
+  public GenericDAOImpl() {
+    this.classy = (Class<T>) ((ParameterizedType) getClass()
+        .getGenericSuperclass()).getActualTypeArguments()[0];
+  }
+
   @Override
-  public List<T> findAll(Class<T> classyClass) {
+  public List<T> findAll() {
     Session session = sessionFactory.openSession();
     CriteriaBuilder builder = session.getCriteriaBuilder();
-    CriteriaQuery<T> criteria = builder.createQuery(classyClass);
-    criteria.from(classyClass);
+    CriteriaQuery<T> criteria = builder.createQuery(classy);
+    criteria.from(classy);
     List<T> entities = session.createQuery(criteria).getResultList();
     session.close();
     return entities;
   }
 
   @Override
-  public T findById(Long id, Class<T> classyClass) {
+  public T findById(Long id) {
     Session session = sessionFactory.openSession();
-    T entity = session.find(classyClass, id);
+    T entity = session.find(classy, id);
     session.close();
     return entity;
   }
 
   @Override
-  public void save(T type){
+  public void save(T type) {
     Session session = sessionFactory.openSession();
     session.beginTransaction();
     session.saveOrUpdate(type);

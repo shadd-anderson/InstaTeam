@@ -6,6 +6,7 @@ import com.InstaTeam.Instant.model.Role;
 import com.InstaTeam.Instant.model.CollaboratorWrapper;
 import com.InstaTeam.Instant.service.CollaboratorService;
 import com.InstaTeam.Instant.service.GenericService;
+import com.InstaTeam.Instant.service.ProjectService;
 import com.InstaTeam.Instant.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,7 +22,7 @@ import javax.validation.Valid;
 @Controller
 public class CollaboratorController {
   @Autowired
-  private GenericService<Project> projectService;
+  private ProjectService projectService;
 
   @Autowired
   private CollaboratorService collaboratorService;
@@ -47,29 +48,32 @@ public class CollaboratorController {
     model.addAttribute("collaborators", collaborators);
     model.addAttribute("project", project);
     model.addAttribute("roles", project.getRolesNeeded());
-    model.addAttribute("action", String.format("/projects/%s/collaborators/add",projectId));
+    model.addAttribute("action", String.format("/projects/%s/collaborators/add", projectId));
     model.addAttribute("collaborator", new Collaborator());
     return "project_collaborators";
   }
 
   @RequestMapping(value = "/projects/{projectId}/collaborators/add", method = RequestMethod.POST)
-  public String addCollaboratorToProject(Model model, @PathVariable Long projectId, @Valid Collaborator collaborator, BindingResult result) {
+  public String addCollaboratorToProject(Model model, @PathVariable Long projectId,
+                                         @Valid Collaborator collaborator, BindingResult result) {
     Project project = projectService.findById(projectId);
     Role role = roleService.findById(collaborator.getRole().getId());
     collaborator.setRole(role);
     collaboratorService.save(collaborator);
     project.addCollaborator(collaborator);
     projectService.save(project);
-    return String.format("redirect:/projects/%s/collaborators",projectId);
+    return String.format("redirect:/projects/%s/collaborators", projectId);
   }
 
-  //A comment again
   @RequestMapping(value = "/projects/{projectId}/collaborators/update", method = RequestMethod.POST)
-  public String updateProjectCollaborators(@PathVariable Long projectId, CollaboratorWrapper collaborators) {
+  public String updateProjectCollaborators(@PathVariable Long projectId,
+                                           CollaboratorWrapper collaborators) {
     Project project = projectService.findById(projectId);
-    if(collaborators.getWrappedList() != null) {
+    if (collaborators.getWrappedList() != null) {
       for (Collaborator collaborator : collaborators.getWrappedList()) {
-        if(collaborator.getRole() != null) {
+        if (collaborator.getRole() != null) {
+          /*This had to be done because the Spring Framework sends back only one attribute, as
+          opposed to an actual object.*/
           Role role = roleService.findById(collaborator.getRole().getId());
           collaborator.setRole(role);
         }
@@ -80,11 +84,12 @@ public class CollaboratorController {
       project.setCollaborators(null);
     }
     projectService.save(project);
-    return String.format("redirect:/projects/%s",projectId);
+    return String.format("redirect:/projects/%s", projectId);
   }
 
   @RequestMapping(value = "/projects/{projectId}/collaborators/{collaboratorId}/delete", method = RequestMethod.POST)
-  public String deleteCollaborator(@PathVariable Long projectId, @PathVariable Long collaboratorId) {
+  public String deleteCollaborator(@PathVariable Long projectId,
+                                   @PathVariable Long collaboratorId) {
     Project project = projectService.findById(projectId);
     Collaborator collaborator = collaboratorService.findById(collaboratorId);
     project.removeCollaborator(collaborator);
@@ -92,6 +97,6 @@ public class CollaboratorController {
     collaborator.setRole(null);
     collaboratorService.save(collaborator);
     collaboratorService.delete(collaborator);
-    return String.format("redirect:/projects/%s/collaborators",projectId);
+    return String.format("redirect:/projects/%s/collaborators", projectId);
   }
 }

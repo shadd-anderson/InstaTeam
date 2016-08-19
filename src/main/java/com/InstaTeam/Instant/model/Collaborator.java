@@ -22,7 +22,11 @@ public class Collaborator {
   @ManyToOne(cascade = CascadeType.ALL)
   private Role role;
 
-  public Collaborator(){}
+  public Collaborator() {}
+
+  public Collaborator(String name) {
+    this.name = name;
+  }
 
   public Long getId() {
     return id;

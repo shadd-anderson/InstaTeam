@@ -1,75 +1,92 @@
 <!DOCTYPE html>
-<html  xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta charset="utf-8"/>
-        <meta http-equiv="x-ua-compatible" content="ie=edge"/>
-        <title>InstaTeam</title>
-        <link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'/>
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-        <link rel="stylesheet" href="/css/normalize.css"/>
-        <link rel="stylesheet" href="/css/site.css"/>
-    </head>
-    <body>
-        <header>
-            <div class="container">
-                <div class="site-header">
-                    <a class="logo" th:href="@{/}">InstaTeam</a>
-                    <a class="new-project button icon-left" th:href="@{/new-project}" th:if="${project.name != null}"><i class="material-icons">add</i> New Project</a>
+<!--suppress ALL -->
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <title>InstaTeam</title>
+    <link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet'
+          type='text/css'/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/normalize.css"/>
+    <link rel="stylesheet" href="/css/site.css"/>
+</head>
+<body>
+<header>
+    <div class="container">
+        <div class="site-header">
+            <a class="logo" th:href="@{/}">InstaTeam</a>
+            <a class="new-project button icon-left" th:href="@{/new-project}"
+               th:if="${project.name != null}"><i class="material-icons">add</i> New Project</a>
+        </div>
+    </div>
+</header>
+<nav>
+    <h1 class="title-heading" th:text="${editOrNew}">New Project</h1>
+</nav>
+<section>
+    <div class="container wrapper">
+        <form th:object="${project}" th:action="@{${action}}" method="post">
+            <div class="flash" th:classappend="${#strings.toLowerCase(flash.status)}"
+                 th:if="${flash}" th:text="${flash.message}"></div>
+            <input type="hidden" th:field="*{id}"/>
+            <input type="hidden" th:field="*{dateCreated}"/>
+            <div>
+                <label for="project_name"> Project Name:</label>
+                <input type="text" id="project_name" th:field="*{name}"/>
+                <div class="flash error-message" th:if="${#fields.hasErrors('name')}"
+                     th:errors="*{name}"></div>
+            </div>
+            <div>
+                <label for="project_description">Project Description:</label>
+                <textarea rows="4" id="project_description" th:field="*{description}"></textarea>
+                <div class="flash error-message" th:if="${#fields.hasErrors('description')}"
+                     th:errors="*{description}"></div>
+            </div>
+            <div>
+                <label for="project_status">Project Status:</label>
+                <div class="custom-select">
+                    <span class="dropdown-arrow"></span>
+                    <select id="project_status" th:field="*{status}">
+                        <option th:value="${T(com.InstaTeam.Instant.model.Project.Status).Active}">
+                            Active
+                        </option>
+                        <option th:value="${T(com.InstaTeam.Instant.model.Project.Status).Archived}">
+                            Archived
+                        </option>
+                        <option th:value="${T(com.InstaTeam.Instant.model.Project.Status).Pending}">
+                            Pending
+                        </option>
+                    </select>
                 </div>
             </div>
-        </header>
-        <nav>
-            <h1 class="title-heading" th:text="${editOrNew}">New Project</h1>
-        </nav>
-        <section>
-            <div class="container wrapper">
-                <form th:object="${project}" th:action="@{${action}}" method="post">
-                    <div class="flash" th:classappend="${#strings.toLowerCase(flash.status)}" th:if="${flash}" th:text="${flash.message}"></div>
-                    <input type="hidden" th:field="*{id}"/>
-                    <input type="hidden" th:field="*{dateCreated}"/>
-                    <div>
-                        <label for="project_name"> Project Name:</label>
-                        <input type="text" id="project_name" th:field="*{name}"/>
-                        <div class="flash error-message" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-                    </div>
-                    <div>
-                        <label for="project_description">Project Description:</label>
-                        <textarea rows="4" id="project_description" th:field="*{description}"></textarea>
-                        <div class="flash error-message" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
-                    </div>
-                    <div>
-                        <label for="project_status">Project Status:</label>
-                        <div class="custom-select">
-                        <span class="dropdown-arrow"></span>
-                            <select id="project_status" th:field="*{status}">
-                                <option th:value="${T(com.InstaTeam.Instant.model.Project.Status).Active}">Active</option>
-                                <option th:value="${T(com.InstaTeam.Instant.model.Project.Status).Archived}">Archived</option>
-                                <option th:value="${T(com.InstaTeam.Instant.model.Project.Status).Pending}">Pending</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <label>Project Roles:</label>
-                        <ul class="checkbox-list">
-                            <li th:each="role: ${roles}">
-                                <input type="hidden" th:field="*{rolesNeeded[__${roleStat.index}__].id}"/>
-                                <input type="checkbox" th:field="*{rolesNeeded}" th:id="|project_roles${role.id}|" th:value="${#strings.toString(role)}"/>
-                                <label th:for="|project_roles${role.id}|" class="primary" th:text="${role.name}" style="display:inline">Role Name</label>
-                            </li>
-                        </ul>
-                        <div class="flash error-message" style="margin-top: 3%" th:if="${#fields.hasErrors('rolesNeeded')}" th:errors="*{rolesNeeded}"></div>
-                    </div>
-                    <ul style="display: none">
-                        <li th:each="colab: *{collaborators}">
-                            <input type="hidden" th:field="*{collaborators[__${colabStat.index}__].id}" th:value="${colab.id}"/>
-                        </li>
-                    </ul>
-                    <div class="actions">
-                        <input type="submit" value="Save" class="button"/>
-                        <a th:href="${redirect}" class="button button-secondary">Cancel</a>
-                    </div>
-                </form>
+            <div>
+                <label>Project Roles:</label>
+                <ul class="checkbox-list">
+                    <li th:each="role: ${roles}">
+                        <input type="hidden" th:field="*{rolesNeeded[__${roleStat.index}__].id}"/>
+                        <input type="checkbox" th:field="*{rolesNeeded}"
+                               th:id="|project_roles${role.id}|"
+                               th:value="${#strings.toString(role)}"/>
+                        <label th:for="|project_roles${role.id}|" class="primary"
+                               th:text="${role.name}" style="display:inline">Role Name</label>
+                    </li>
+                </ul>
+                <div class="flash error-message" style="margin-top: 3%"
+                     th:if="${#fields.hasErrors('rolesNeeded')}" th:errors="*{rolesNeeded}"></div>
             </div>
-        </section>
-    </body>
+            <ul style="display: none">
+                <li th:each="colab: *{collaborators}">
+                    <input type="hidden" th:field="*{collaborators[__${colabStat.index}__].id}"
+                           th:value="${colab.id}"/>
+                </li>
+            </ul>
+            <div class="actions">
+                <input type="submit" value="Save" class="button"/>
+                <a th:href="${redirect}" class="button button-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</section>
+</body>
 </html>

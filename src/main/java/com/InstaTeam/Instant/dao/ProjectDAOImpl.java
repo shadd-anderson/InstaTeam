@@ -18,13 +18,13 @@ public class ProjectDAOImpl extends GenericDAOImpl<Project> implements ProjectDA
   private SessionFactory sessionFactory;
 
   @Override
-  public List<Project> findAll(Class<Project> classy) {
+  public List<Project> findAll() {
     Session session = sessionFactory.openSession();
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<Project> criteria = builder.createQuery(Project.class);
     criteria.from(Project.class);
     List<Project> projects = session.createQuery(criteria).getResultList();
-    for(Project project: projects) {
+    for (Project project : projects) {
       Hibernate.initialize(project.getCollaborators());
       Hibernate.initialize(project.getRolesNeeded());
     }
@@ -33,9 +33,9 @@ public class ProjectDAOImpl extends GenericDAOImpl<Project> implements ProjectDA
   }
 
   @Override
-  public Project findById(Long id, Class<Project> projectClass) {
+  public Project findById(Long id) {
     Session session = sessionFactory.openSession();
-    Project project = session.get(projectClass, id);
+    Project project = session.get(Project.class, id);
     Hibernate.initialize(project.getCollaborators());
     Hibernate.initialize(project.getRolesNeeded());
     session.close();

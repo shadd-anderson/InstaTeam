@@ -1,18 +1,13 @@
 package com.InstaTeam.Instant.model;
 
-import org.hibernate.annotations.LazyCollection;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -45,7 +40,8 @@ public class Project {
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:MM:SS.sss")
   private Date dateCreated;
 
-  public Project(){}
+  public Project() {
+  }
 
   public Long getId() {
     return id;
@@ -71,7 +67,7 @@ public class Project {
     this.description = description;
   }
 
-  private Status getStatus() {
+  public Status getStatus() {
     return status;
   }
 
@@ -95,7 +91,7 @@ public class Project {
     this.collaborators = collaborators;
   }
 
-  private Date getDateCreated() {
+  public Date getDateCreated() {
     return dateCreated;
   }
 
@@ -107,9 +103,13 @@ public class Project {
     collaborators.add(collaborator);
   }
 
-  public void removeCollaborator(Collaborator collaborator) {collaborators.remove(collaborator);}
+  public void removeCollaborator(Collaborator collaborator) {
+    collaborators.remove(collaborator);
+  }
 
-  public void removeRole(Role role) {rolesNeeded.remove(role);}
+  public void removeRole(Role role) {
+    rolesNeeded.remove(role);
+  }
 
   public enum Status {
     Active, Pending, Archived
@@ -121,7 +121,7 @@ public class Project {
   }
 
   public static Comparator<Project> projectComparator = (a1, a2) -> {
-    if(a1.getStatus().equals(a2.getStatus())) {
+    if (a1.getStatus().equals(a2.getStatus())) {
       return a1.getDateCreated().compareTo(a2.getDateCreated());
     } else {
       return a1.getStatus().compareTo(a2.getStatus());

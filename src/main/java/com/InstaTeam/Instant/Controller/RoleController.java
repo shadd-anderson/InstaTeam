@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,32 +67,43 @@ public class RoleController {
     return "redirect:/roles";
   }
 
+  //This one was a whopper. Explanations inside the method
   @SuppressWarnings({"unchecked", "ResultOfMethodCallIgnored"})
   @RequestMapping(value = "/roles/{roleId}/delete", method = RequestMethod.POST)
   public String deleteRole(@PathVariable Long roleId, RedirectAttributes attributes) {
     Role role = roleService.findById(roleId);
+    /*This is a Map to keep track of the Projects that were changed,
+    along with its individual Collaborators*/
     Map<Project, List<Collaborator>> changed = new HashMap<>();
+
+    //If deleting the role affects any Project, this gets run
     if (projectService.findAll().stream().filter(project -> project.getRolesNeeded().contains(role))
         .findAny().isPresent()) {
       List<Collaborator> allChanged;
-      List<Project>
-          conflicting =
-          projectService.findAll().stream()
+      List<Project> conflicting = projectService.findAll().stream()
               .filter(project -> project.getRolesNeeded().contains(role)).collect(
               Collectors.toList());
+
+      //This is where correlating collaborators get added, if any
       if (collaboratorService.findAll().stream()
           .filter(collaborator -> collaborator.getRole().equals(role)).findAny().isPresent()) {
-        allChanged =
-            collaboratorService.findAll().stream()
+        allChanged = collaboratorService.findAll().stream()
                 .filter(collaborator -> collaborator.getRole().equals(role)).collect(
                 Collectors.toList());
         for (Project project : conflicting) {
-          List<Collaborator> projectChanged =
-              allChanged.stream()
+          //The collaborators changed in individual Projects
+          List<Collaborator> projectChanged = allChanged.stream()
                   .filter(collaborator -> project.getCollaborators().contains(collaborator))
                   .collect(Collectors.toList());
-          changed.put(project, projectChanged);
+          if(!projectChanged.isEmpty()) {
+            changed.put(project, projectChanged);
+          } else {
+            //Places a "new" Collaborator with the name None. This is only for flash message purposes
+            changed.put(project, Collections.singletonList(new Collaborator("None")));
+          }
         }
+
+        //This re-assigns roles automatically based on Project needs
         for (Collaborator collaborator : allChanged) {
           for (Project project : conflicting) {
             if (project.getCollaborators().contains(collaborator)) {
@@ -97,8 +111,10 @@ public class RoleController {
                 if (project.getRolesNeeded().size() > 1) {
                   collaborator.setRole(project.getRolesNeeded().get(1));
                 } else {
+                  //If a Project requires only the Role that is being deleted, this error comes up
                   attributes.addFlashAttribute("flash", new FlashMessage(String
-                      .format("The project \"%s\" only requires a %s. Please unassign this role before deleting it.",
+                      .format(
+                          "The project \"%s\" only requires a %s. Please unassign this role before deleting it.",
                           project.getName(), role.getName()), Status.FAILURE));
                   return "redirect:/roles";
                 }
@@ -109,6 +125,10 @@ public class RoleController {
           }
           collaboratorService.save(collaborator);
         }
+      } else {
+        for(Project project: conflicting) {
+          changed.put(project, Collections.singletonList(new Collaborator("None")));
+        }
       }
       for (Project project : conflicting) {
         project.removeRole(role);
@@ -116,11 +136,17 @@ public class RoleController {
       }
     }
     roleService.delete(role);
+
+    //Constructs flash message. HTML tags are put in so Project links are added
     String changedMessage = "";
     if (!changed.entrySet().isEmpty()) {
-      changedMessage += String.format("<p>The following have been affected with the deletion of %s:</p>",role.getName());
+      changedMessage +=
+          String.format("<p>The following have been affected with the deletion of %s:</p>",
+              role.getName());
       for (Map.Entry entry : changed.entrySet()) {
-        changedMessage += "<p>Project: <a href=\"/projects/" + ((Project)entry.getKey()).getId() + "/collaborators\">" + entry.getKey().toString() + "</a> with Collaborators: ";
+        changedMessage +=
+            "<p>Project: <a href=\"/projects/" + ((Project) entry.getKey()).getId()
+                + "/collaborators\">" + entry.getKey().toString() + "</a> with Collaborators: ";
         for (Collaborator collaborator : (List<Collaborator>) entry.getValue()) {
           changedMessage += collaborator.getName();
           if (((List<Collaborator>) entry.getValue()).indexOf(collaborator)
@@ -140,4 +166,3 @@ public class RoleController {
     return "redirect:/roles";
   }
 }
-

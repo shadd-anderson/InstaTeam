@@ -45,7 +45,6 @@ public class ProjectController {
     return "index";
   }
 
-
   @RequestMapping(value = "/new-project", method = RequestMethod.POST)
   public String saveNewProject(Model model, @Valid Project project, BindingResult result,
                                RedirectAttributes attributes) {
@@ -69,8 +68,9 @@ public class ProjectController {
 
   @RequestMapping("/new-project")
   public String newProject(Model model, RedirectAttributes attributes) {
-    if(roleService.findAll().isEmpty()) {
-      attributes.addFlashAttribute("flash", new FlashMessage("Projects cannot be created without assigning a role. Please create at least one before adding a project.",
+    if (roleService.findAll().isEmpty()) {
+      attributes.addFlashAttribute("flash", new FlashMessage(
+          "Projects cannot be created without assigning a role. Please create at least one before adding a project.",
           FlashMessage.Status.FAILURE));
       return "redirect:/roles";
     }
@@ -103,11 +103,11 @@ public class ProjectController {
   @RequestMapping("/projects/{projectId}/edit")
   public String projectEdit(@PathVariable Long projectId, Model model) {
     model.addAttribute("roles", roleService.findAll());
-    if(!model.containsAttribute("project")) {
+    if (!model.containsAttribute("project")) {
       Project project = projectService.findById(projectId);
       model.addAttribute("project", project);
       model.addAttribute("collaborators", project.getCollaborators());
-      model.addAttribute("editOrNew", String.format("Edit %s",project.getName()));
+      model.addAttribute("editOrNew", String.format("Edit %s", project.getName()));
     }
     model.addAttribute("action", String.format("/projects/%s/edit", projectId));
     model.addAttribute("redirect", String.format("/projects/%s", projectId));
@@ -121,13 +121,13 @@ public class ProjectController {
       attributes.addFlashAttribute("project", project);
       attributes.addFlashAttribute("org.springframework.validation.BindingResult.project", result);
       attributes.addFlashAttribute("collaborators", project.getCollaborators());
-      attributes.addFlashAttribute("editOrNew", String.format("Edit %s",project.getName()));
+      attributes.addFlashAttribute("editOrNew", String.format("Edit %s", project.getName()));
       return String.format("redirect:/projects/%s/edit", project.getId());
     }
     List<Role> newRoles = project.getRolesNeeded() != null ?
         project.getRolesNeeded().stream().map(role -> roleService.findByName(role.getName()))
             .collect(Collectors.toList()) : new ArrayList<>();
-    if(project.getRolesNeeded() != null) {
+    if (project.getRolesNeeded() != null) {
       project.setRolesNeeded(project.getRolesNeeded().stream()
           .filter(role -> role.getName() != null).collect(Collectors.toList()));
       project.setRolesNeeded(newRoles);
@@ -135,7 +135,8 @@ public class ProjectController {
     projectService.save(project);
     if (project.getCollaborators().stream()
         .filter(collaborator -> !newRoles
-            .contains(collaboratorService.findById(collaborator.getId()).getRole())).findFirst().isPresent()) {
+            .contains(collaboratorService.findById(collaborator.getId()).getRole())).findFirst()
+        .isPresent()) {
       attributes.addFlashAttribute("flash",
           new FlashMessage("You have removed a role previously assigned to a Collaborator. "
               + "Please re-assign collaborator roles", FlashMessage.Status.FAILURE));
@@ -150,7 +151,7 @@ public class ProjectController {
     List<Collaborator> collaborators = new ArrayList<>(project.getCollaborators());
     collaborators.forEach(project::removeCollaborator);
     projectService.save(project);
-    for(Collaborator collaborator: collaborators) {
+    for (Collaborator collaborator : collaborators) {
       collaborator.setRole(null);
       collaboratorService.delete(collaborator);
     }
