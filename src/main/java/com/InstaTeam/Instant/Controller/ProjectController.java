@@ -21,10 +21,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 
@@ -58,11 +56,8 @@ public class ProjectController {
     }
     List<Role> roles = new ArrayList<>();
     if (project.getRolesNeeded() != null) {
-      for (Role role : project.getRolesNeeded()) {
-        if (role.getName() != null) {
-          roles.add(roleService.findByName(role.getName()));
-        }
-      }
+      roles.addAll(project.getRolesNeeded().stream().filter(role -> role.getName() != null)
+          .map(role -> roleService.findByName(role.getName())).collect(Collectors.toList()));
       project.setRolesNeeded(roles);
     } else {
       project.setRolesNeeded(new ArrayList<>());
@@ -153,9 +148,7 @@ public class ProjectController {
   public String deleteProject(@PathVariable Long projectId) {
     Project project = projectService.findById(projectId);
     List<Collaborator> collaborators = new ArrayList<>(project.getCollaborators());
-    for(Collaborator collaborator: collaborators) {
-      project.removeCollaborator(collaborator);
-    }
+    collaborators.forEach(project::removeCollaborator);
     projectService.save(project);
     for(Collaborator collaborator: collaborators) {
       collaborator.setRole(null);

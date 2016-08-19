@@ -13,12 +13,12 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
 @Repository
-public class ProjectDAOImpl implements ProjectDAO {
+public class ProjectDAOImpl extends GenericDAOImpl<Project> implements ProjectDAO {
   @Autowired
   private SessionFactory sessionFactory;
 
   @Override
-  public List<Project> findAll() {
+  public List<Project> findAll(Class<Project> classy) {
     Session session = sessionFactory.openSession();
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<Project> criteria = builder.createQuery(Project.class);
@@ -33,30 +33,12 @@ public class ProjectDAOImpl implements ProjectDAO {
   }
 
   @Override
-  public Project findById(Long id) {
+  public Project findById(Long id, Class<Project> projectClass) {
     Session session = sessionFactory.openSession();
-    Project project = session.get(Project.class, id);
+    Project project = session.get(projectClass, id);
     Hibernate.initialize(project.getCollaborators());
     Hibernate.initialize(project.getRolesNeeded());
     session.close();
     return project;
-  }
-
-  @Override
-  public void save(Project project) {
-    Session session = sessionFactory.openSession();
-    session.beginTransaction();
-    session.saveOrUpdate(project);
-    session.getTransaction().commit();
-    session.close();
-  }
-
-  @Override
-  public void delete(Project project) {
-    Session session = sessionFactory.openSession();
-    session.beginTransaction();
-    session.delete(project);
-    session.getTransaction().commit();
-    session.close();
   }
 }

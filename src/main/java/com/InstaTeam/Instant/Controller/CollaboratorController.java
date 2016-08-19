@@ -5,7 +5,7 @@ import com.InstaTeam.Instant.model.Project;
 import com.InstaTeam.Instant.model.Role;
 import com.InstaTeam.Instant.model.CollaboratorWrapper;
 import com.InstaTeam.Instant.service.CollaboratorService;
-import com.InstaTeam.Instant.service.ProjectService;
+import com.InstaTeam.Instant.service.GenericService;
 import com.InstaTeam.Instant.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,13 +21,13 @@ import javax.validation.Valid;
 @Controller
 public class CollaboratorController {
   @Autowired
-  ProjectService projectService;
+  private GenericService<Project> projectService;
 
   @Autowired
-  CollaboratorService collaboratorService;
+  private CollaboratorService collaboratorService;
 
   @Autowired
-  RoleService roleService;
+  private RoleService roleService;
 
   @RequestMapping("/collaborators")
   public String collaborators(Model model) {

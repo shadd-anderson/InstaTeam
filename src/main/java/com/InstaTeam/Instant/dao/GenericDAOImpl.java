@@ -1,55 +1,53 @@
 package com.InstaTeam.Instant.dao;
 
-import com.InstaTeam.Instant.model.Collaborator;
-import com.InstaTeam.Instant.model.Project;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
 @Repository
-public class CollaboratorDAOImpl implements CollaboratorDAO {
+public abstract class GenericDAOImpl<T> implements GenericDAO<T> {
   @Autowired
   SessionFactory sessionFactory;
 
   @Override
-  public List<Collaborator> findAll() {
+  public List<T> findAll(Class<T> classyClass) {
     Session session = sessionFactory.openSession();
     CriteriaBuilder builder = session.getCriteriaBuilder();
-    CriteriaQuery<Collaborator> criteria = builder.createQuery(Collaborator.class);
-    criteria.from(Collaborator.class);
-    List<Collaborator> collaborators = session.createQuery(criteria).getResultList();
+    CriteriaQuery<T> criteria = builder.createQuery(classyClass);
+    criteria.from(classyClass);
+    List<T> entities = session.createQuery(criteria).getResultList();
     session.close();
-    return collaborators;
+    return entities;
   }
 
   @Override
-  public Collaborator findById(Long id) {
+  public T findById(Long id, Class<T> classyClass) {
     Session session = sessionFactory.openSession();
-    Collaborator collaborator = session.find(Collaborator.class, id);
+    T entity = session.find(classyClass, id);
     session.close();
-    return collaborator;
+    return entity;
   }
 
   @Override
-  public void save(Collaborator collaborator) {
+  public void save(T type){
     Session session = sessionFactory.openSession();
     session.beginTransaction();
-    session.saveOrUpdate(collaborator);
+    session.saveOrUpdate(type);
     session.getTransaction().commit();
     session.close();
   }
 
   @Override
-  public void delete(Collaborator collaborator) {
+  public void delete(T type) {
     Session session = sessionFactory.openSession();
     session.beginTransaction();
-    session.delete(collaborator);
+    session.delete(type);
     session.getTransaction().commit();
     session.close();
   }

@@ -14,28 +14,9 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
 @Repository
-public class RoleDAOImpl implements RoleDAO {
+public class RoleDAOImpl extends GenericDAOImpl<Role> implements RoleDAO {
   @Autowired
   private SessionFactory sessionFactory;
-
-  @Override
-  public List<Role> findAll() {
-    Session session = sessionFactory.openSession();
-    CriteriaBuilder builder = session.getCriteriaBuilder();
-    CriteriaQuery<Role> criteria = builder.createQuery(Role.class);
-    criteria.from(Role.class);
-    List<Role> roles = session.createQuery(criteria).getResultList();
-    session.close();
-    return roles;
-  }
-
-  @Override
-  public Role findById(Long id) {
-    Session session = sessionFactory.openSession();
-    Role role = session.get(Role.class, id);
-    session.close();
-    return role;
-  }
 
   @Override
   public Role findByName(String name) {
@@ -43,23 +24,5 @@ public class RoleDAOImpl implements RoleDAO {
     Query query = session.createQuery("from Role where name=:name");
     query.setParameter("name", name);
     return (Role) query.uniqueResult();
-  }
-
-  @Override
-  public void save(Role role) {
-    Session session = sessionFactory.openSession();
-    session.beginTransaction();
-    session.saveOrUpdate(role);
-    session.getTransaction().commit();
-    session.close();
-  }
-
-  @Override
-  public void delete(Role role) {
-    Session session = sessionFactory.openSession();
-    session.beginTransaction();
-    session.delete(role);
-    session.getTransaction().commit();
-    session.close();
   }
 }

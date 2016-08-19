@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,7 @@ import javax.validation.Valid;
 @Controller
 public class RoleController {
   @Autowired
-  RoleService roleService;
+  private RoleService roleService;
 
   @Autowired
   private ProjectService projectService;
@@ -85,12 +84,10 @@ public class RoleController {
                 .filter(collaborator -> collaborator.getRole().equals(role)).collect(
                 Collectors.toList());
         for (Project project : conflicting) {
-          List<Collaborator> projectChanged = new ArrayList<>();
-          for (Collaborator collaborator : allChanged) {
-            if (project.getCollaborators().contains(collaborator)) {
-              projectChanged.add(collaborator);
-            }
-          }
+          List<Collaborator> projectChanged =
+              allChanged.stream()
+                  .filter(collaborator -> project.getCollaborators().contains(collaborator))
+                  .collect(Collectors.toList());
           changed.put(project, projectChanged);
         }
         for (Collaborator collaborator : allChanged) {

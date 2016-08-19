@@ -71,7 +71,7 @@ public class Project {
     this.description = description;
   }
 
-  public Status getStatus() {
+  private Status getStatus() {
     return status;
   }
 
@@ -95,7 +95,7 @@ public class Project {
     this.collaborators = collaborators;
   }
 
-  public Date getDateCreated() {
+  private Date getDateCreated() {
     return dateCreated;
   }
 
