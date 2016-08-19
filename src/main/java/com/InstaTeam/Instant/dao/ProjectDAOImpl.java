@@ -24,6 +24,10 @@ public class ProjectDAOImpl implements ProjectDAO {
     CriteriaQuery<Project> criteria = builder.createQuery(Project.class);
     criteria.from(Project.class);
     List<Project> projects = session.createQuery(criteria).getResultList();
+    for(Project project: projects) {
+      Hibernate.initialize(project.getCollaborators());
+      Hibernate.initialize(project.getRolesNeeded());
+    }
     session.close();
     return projects;
   }

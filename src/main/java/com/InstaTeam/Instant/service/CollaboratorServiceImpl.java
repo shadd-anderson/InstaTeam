@@ -18,8 +18,19 @@ public class CollaboratorServiceImpl implements CollaboratorService {
     return collaboratorDAO.findAll();
   }
 
+
   @Override
   public void save(Collaborator collaborator) {
     collaboratorDAO.save(collaborator);
+  }
+
+  @Override
+  public Collaborator findById(Long id) {
+    return collaboratorDAO.findById(id);
+  }
+
+  @Override
+  public void delete(Collaborator collaborator) {
+    collaboratorDAO.delete(collaborator);
   }
 }

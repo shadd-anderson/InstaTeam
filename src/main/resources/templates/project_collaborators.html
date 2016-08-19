@@ -1,67 +1,99 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8"/>
-        <meta http-equiv="x-ua-compatible" content="ie=edge"/>
-        <title>InstaTeam</title>
-        <link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'/>
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-        <link rel="stylesheet" href="/css/normalize.css"/>
-        <link rel="stylesheet" href="/css/site.css"/>
-    </head>
-    <body>
-        <header>
-            <div class="container">
-                <div class="site-header">
-                    <a class="logo" th:href="@{/}">InstaTeam</a>
-                    <a class="new-project button icon-left" th:href="@{/new-project}"><i class="material-icons">add</i> New Project</a>
-                </div>
-            </div>
-        </header>
-        <nav>
-            <ul>
-                <li class="selected"><a th:href="@{/}">Projects</a></li>
-                <li><a th:href="@{/collaborators}">Collaborators</a></li>
-                <li><a th:href="@{/roles}">Roles</a></li>
-            </ul>
-        </nav>
-        <section>
-            <div class="container wrapper">
-                <form th:object="${collaborators}" th:action="|/projects/${project.id}/collaborators/update|" method="post">
-                    <label th:text="|Edit collaborators: ${project.name}">Edit Collaborators: Website Project</label>
-                    <ul class="checkbox-list">
-                        <li th:each="colab, colabStat :*{wrappedList}"><span class="primary" th:text="${colab.name}">Collaborator Name</span>
-                            <input type="hidden" th:field="*{wrappedList[__${colabStat.index}__].name}" th:value="${colab.name}"/>
-                            <input type="hidden" th:field="*{wrappedList[__${colabStat.index}__].id}" th:value="${colab.id}"/>
-                            <div class="custom-select">
-                                <span class="dropdown-arrow"></span>
-                                <select th:field="*{wrappedList[__${colabStat.index}__].role.id}">
-                                    <option th:each="role:${roles}" th:value="${role.id}" th:text="${role.name}">Role</option>
-                                </select>
-                            </div>
-                        </li>
-                    </ul>
-                    <div class="actions">
-                        <input type="submit" value="Save" class="button"/>
-                        <a th:href="@{|/projects/${project.id}|}" class="button button-secondary">Cancel</a>
-                    </div>
-                </form>
-                <form th:action="@{|/projects/${project.id}/collaborators/add|}" th:object="${collaborator}" method="post">
-                    <div class="actions add-new-collaborator">
-                        <label>Add new Collaborator:</label>
-                        <input type="text" th:field="*{name}" placeholder="Name..."/>
-                        <input type="hidden" th:field="*{id}"/>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <title>InstaTeam</title>
+    <link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet'
+          type='text/css'/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/normalize.css"/>
+    <link rel="stylesheet" href="/css/site.css"/>
+</head>
+<body>
+<header>
+    <div class="container">
+        <div class="site-header">
+            <a class="logo" th:href="@{/}">InstaTeam</a>
+            <a class="new-project button icon-left" th:href="@{/new-project}"><i
+                    class="material-icons">add</i> New Project</a>
+        </div>
+    </div>
+</header>
+<nav>
+    <ul>
+        <li><a th:href="@{/}">Projects</a></li>
+        <li><a th:href="@{/roles}">Roles</a></li>
+    </ul>
+</nav>
+<section>
+    <div class="container wrapper">
+        <div class="clearfix">
+            <div th:if="${flash}" th:text="${flash.message}" class="flash"
+                 th:classappend="${#strings.toLowerCase(flash.status)}"
+                 style="width: 90%;margin: 2% auto 0;"></div>
+            <form th:object="${collaborators}"
+                  th:action="|/projects/${project.id}/collaborators/update|" method="post"
+                  class="left-side">
+                <label th:text="|Edit collaborators: ${project.name}">Edit Collaborators: Website
+                                                                      Project</label>
+                <ul class="checkbox-list">
+                    <li th:each="colab, colabStat :*{wrappedList}"><span class="primary"
+                                                                         th:text="${colab.name}">Collaborator Name</span>
+                        <input type="hidden" th:field="*{wrappedList[__${colabStat.index}__].name}"
+                               th:value="${colab.name}"/>
+                        <input type="hidden" th:field="*{wrappedList[__${colabStat.index}__].id}"
+                               th:value="${colab.id}"/>
                         <div class="custom-select">
                             <span class="dropdown-arrow"></span>
-                            <select th:field="*{role.id}">
-                                <option th:each="role:${roles}" th:value="${role.id}" th:text="${role.name}">
-                                    Role...</option>
+                            <select th:field="*{wrappedList[__${colabStat.index}__].role.id}"
+                                    style="margin-right:-35px">
+                                <option th:each="role:${roles}" th:value="${role.id}"
+                                        th:text="${role.name}">Role
+                                </option>
                             </select>
                         </div>
-                        <input type="submit" class="button" value="Add Collaborator"/>
-                    </div>
-                </form>
+                    </li>
+                </ul>
+                <div class="actions">
+                    <input type="submit" value="Save" class="button"/>
+                    <a th:href="@{|/projects/${project.id}|}"
+                       class="button button-secondary">Cancel</a>
+                </div>
+            </form>
+            <div class="right-side">
+                <label class="form-label">Remove:</label>
+                <ul class="checkbox-list">
+                    <li th:each="colab, colabStat:${collaborators.wrappedList}">
+                        <form th:action="@{|/projects/${project.id}/collaborators/${collaborators.wrappedList[__${colabStat.index}__].id}/delete|}"
+                              method="post" style="display: inline">
+                            <button class="button delete-button inline-button" type="submit"
+                                    style="float:left; margin-top:-30px">Remove
+                            </button>
+                        </form>
+                    </li>
+                </ul>
             </div>
-        </section>
-    </body>
+        </div>
+        <form th:action="@{|/projects/${project.id}/collaborators/add|}" th:object="${collaborator}"
+              method="post">
+            <div class="actions add-new-collaborator">
+                <label>Add new Collaborator:</label>
+                <input type="text" th:field="*{name}" placeholder="Name..."/>
+                <input type="hidden" th:field="*{id}"/>
+                <div class="custom-select">
+                    <span class="dropdown-arrow"></span>
+                    <select th:field="*{role.id}">
+                        <option th:each="role:${roles}" th:value="${role.id}"
+                                th:text="${role.name}">
+                            Role...
+                        </option>
+                    </select>
+                </div>
+                <input type="submit" class="button" value="Add Collaborator"/>
+            </div>
+        </form>
+    </div>
+</section>
+</body>
 </html>

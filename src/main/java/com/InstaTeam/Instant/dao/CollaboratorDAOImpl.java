@@ -30,7 +30,10 @@ public class CollaboratorDAOImpl implements CollaboratorDAO {
 
   @Override
   public Collaborator findById(Long id) {
-    return null;
+    Session session = sessionFactory.openSession();
+    Collaborator collaborator = session.find(Collaborator.class, id);
+    session.close();
+    return collaborator;
   }
 
   @Override
@@ -44,6 +47,10 @@ public class CollaboratorDAOImpl implements CollaboratorDAO {
 
   @Override
   public void delete(Collaborator collaborator) {
-
+    Session session = sessionFactory.openSession();
+    session.beginTransaction();
+    session.delete(collaborator);
+    session.getTransaction().commit();
+    session.close();
   }
 }

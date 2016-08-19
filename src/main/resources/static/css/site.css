@@ -12,7 +12,7 @@ body {
 }
 .container {
 	margin: 0 auto;
-	padding: 0;
+	padding: 0 0 1px;
 	background: transparent;
 	max-width: 700px;
 }
@@ -272,6 +272,24 @@ strong {
         padding-bottom: 20px;
         color: #d3d3d2;
 }
+.left-side {
+        float: left;
+        width: 70%;
+}
+.right-side {
+        float: right;
+        width: 10%;
+        padding: 35px 35px 0;
+}
+.clearfix {
+        overflow: hidden;
+}
+.empty-notification {
+        padding: 15px 15px 15px;
+        text-align: center;
+        color: #837c7c;
+        margin: 0;
+}
 
 
 /* ==========================================================================
@@ -304,9 +322,9 @@ strong {
 .custom-select .dropdown-arrow {
   background: #FFF;
   bottom: 3px;
-  position: absolute;
-  right: 3px;
-  top: 7px;
+  position: relative;
+  left: 195px;
+  top: 23px;
   width: 26px;
   pointer-events: none;
 }
@@ -332,7 +350,30 @@ strong {
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
 }
-
+.flash {
+  color: white;
+  text-align: center;
+  width: 105%;
+  margin: -2.5% 0 5% -3.5%;
+  padding: 1%;
+  border-radius: 10px;
+}
+.success {
+  background: #00cc00;
+}
+.failure {
+  background: #cc0000;
+}
+.error-message {
+  background: #cc0000;
+  margin: -3% auto 3% auto;
+  width: 90%;
+}
+.form-label {
+	display: block;
+	margin-bottom: 13px;
+	color: white;
+}
 
 
 

@@ -21,29 +21,31 @@
         <nav>
             <ul>
                 <li><a th:href="@{/}">Projects</a></li>
-                <li><a th:href="@{/collaborators}">Collaborators</a></li>
                 <li class="selected"><a th:href="@{/roles}">Roles</a></li>
             </ul>
         </nav>
         <section>
             <div class="container wrapper">
                 <div class="form">
+                    <div class="flash" th:if="${flash}" th:classappend="${#strings.toLowerCase(flash.status)}" th:utext="${flash.message}"></div>
                     <h2 style="display:inline">Manage Roles</h2>
                     <h2 th:if="${project != null}" style="display:inline" th:text="| for ${project.name}|"></h2>
                     <div>
+                        <h2 th:if="${#lists.isEmpty(roles)}" class="empty-notification" style="padding-bottom: 0;">No roles created! Add one below</h2>
                         <ul class="checkbox-list">
                             <li th:each="role: ${roles}"><span class="primary" th:text="${role.name}">Developer</span>
-                                <form th:action="@{|/role/${role.id}/delete|}" method="post" style="display: inline">
+                                <form th:action="@{|/roles/${role.id}/delete|}" method="post" style="display: inline">
                                     <button class="button delete-button inline-button" type="submit">Delete Role</button></form></li>
                         </ul>
                     </div>
                 </div>
-                <form th:object="${role}" action="/roles/add" method="post">
+                <form th:object="${role}" action="/roles/add" method="post" style="padding-top: 0;">
                     <div class="actions add-new-role">
                         <input type="hidden" th:field="*{id}"/>
                         <input type="text" th:field="*{name}" placeholder="New Role..."/>
                         <input type="submit" value="Submit" class="button"/>
                     </div>
+                    <div class="flash error-message" style="margin-left: 10px" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                 </form>
             </div>
         </section>

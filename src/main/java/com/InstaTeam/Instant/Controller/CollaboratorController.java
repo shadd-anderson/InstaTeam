@@ -3,7 +3,7 @@ package com.InstaTeam.Instant.Controller;
 import com.InstaTeam.Instant.model.Collaborator;
 import com.InstaTeam.Instant.model.Project;
 import com.InstaTeam.Instant.model.Role;
-import com.InstaTeam.Instant.model.Wrapper;
+import com.InstaTeam.Instant.model.CollaboratorWrapper;
 import com.InstaTeam.Instant.service.CollaboratorService;
 import com.InstaTeam.Instant.service.ProjectService;
 import com.InstaTeam.Instant.service.RoleService;
@@ -43,7 +43,7 @@ public class CollaboratorController {
   public String editCollaborators(Model model, @PathVariable Long projectId) {
     Project project = projectService.findById(projectId);
     List<Collaborator> collaboratorList = project.getCollaborators();
-    Wrapper<Collaborator> collaborators = new Wrapper<>(collaboratorList);
+    CollaboratorWrapper collaborators = new CollaboratorWrapper(collaboratorList);
     model.addAttribute("collaborators", collaborators);
     model.addAttribute("project", project);
     model.addAttribute("roles", project.getRolesNeeded());
@@ -65,15 +65,33 @@ public class CollaboratorController {
 
   //A comment again
   @RequestMapping(value = "/projects/{projectId}/collaborators/update", method = RequestMethod.POST)
-  public String updateProjectCollaborators(@PathVariable Long projectId, Wrapper<Collaborator> collaborators) {
+  public String updateProjectCollaborators(@PathVariable Long projectId, CollaboratorWrapper collaborators) {
     Project project = projectService.findById(projectId);
-    for(Collaborator collaborator: collaborators.getWrappedList()) {
-      Role role = roleService.findById(collaborator.getRole().getId());
-      collaborator.setRole(role);
-      collaboratorService.save(collaborator);
+    if(collaborators.getWrappedList() != null) {
+      for (Collaborator collaborator : collaborators.getWrappedList()) {
+        if(collaborator.getRole() != null) {
+          Role role = roleService.findById(collaborator.getRole().getId());
+          collaborator.setRole(role);
+        }
+        collaboratorService.save(collaborator);
+      }
+      project.setCollaborators(collaborators.getWrappedList());
+    } else {
+      project.setCollaborators(null);
     }
-    project.setCollaborators(collaborators.getWrappedList());
     projectService.save(project);
     return String.format("redirect:/projects/%s",projectId);
+  }
+
+  @RequestMapping(value = "/projects/{projectId}/collaborators/{collaboratorId}/delete", method = RequestMethod.POST)
+  public String deleteCollaborator(@PathVariable Long projectId, @PathVariable Long collaboratorId) {
+    Project project = projectService.findById(projectId);
+    Collaborator collaborator = collaboratorService.findById(collaboratorId);
+    project.removeCollaborator(collaborator);
+    projectService.save(project);
+    collaborator.setRole(null);
+    collaboratorService.save(collaborator);
+    collaboratorService.delete(collaborator);
+    return String.format("redirect:/projects/%s/collaborators",projectId);
   }
 }

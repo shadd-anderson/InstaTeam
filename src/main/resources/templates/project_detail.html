@@ -21,7 +21,6 @@
         <nav>
             <ul>
                 <li><a th:href="@{/}">Projects</a></li>
-                <li><a th:href="@{/collaborators}">Collaborators</a></li>
                 <li><a th:href="@{/roles}">Roles</a></li>
             </ul>
         </nav>
@@ -34,10 +33,10 @@
                         <span class="tag" th:text="${project.status}" th:classappend="${#strings.toLowerCase(project.status)}">Active</span>
                     </div>
                     <div class="roles-collaborators">
-                        <h3>Roles &amp; Collaborators</h3>
-                        <div class="list-item" th:each="colab: ${project.collaborators}">
-                            <span class="primary" th:text="${colab.role.name}">Developer</span>
-                            <span class="secondary" th:text="${colab.name}">Michael Pemulis</span>
+                        <h3>Collaborators &amp; Roles</h3>
+                        <div class="list-item clearfix" th:each="colab: ${collaborators}">
+                            <span class="secondary" th:if="${colab.role != null}" th:text="${colab.role.name}">Developer</span>
+                            <span class="primary" th:text="${colab.name}">Michael Pemulis</span>
                         </div>
                     </div>
                     <div class="actions">

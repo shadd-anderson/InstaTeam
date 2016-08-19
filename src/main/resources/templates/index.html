@@ -21,18 +21,23 @@
         <nav>
             <ul>
                 <li class="selected"><a th:href="@{/}">Projects</a></li>
-                <li><a th:href="@{/collaborators}">Collaborators</a></li>
                 <li><a th:href="@{/roles}">Roles</a></li>
             </ul>
         </nav>
         <section>
             <div class="container wrapper">
                 <div class="project-list">
-                    <div class="project" th:each="project: ${projects}">
-                        <h2><a th:href="@{|/projects/${project.id}|}" th:text="${project.name}">Website Project</a></h2>
-                        <p th:text="${project.description}">Design and build a custom website</p>
+                    <h2 th:if="${#lists.isEmpty(projects)}" class="empty-notification">No projects! Why not create one?</h2>
+                    <div class="project clearfix" th:each="project: ${projects}">
+                        <div class="left-side">
+                            <h2><a th:href="@{|/projects/${project.id}|}" th:text="${project.name}">Website Project</a></h2>
+                            <p th:text="${project.description}">Design and build a custom website</p>
+                        </div>
+                        <div class="right-side" style="text-align: right; width: 25%; padding: 35px 0 0">
+                            <p>Project created on <span th:text="${#dates.format(project.dateCreated, 'MMM dd, yyyy')}"></span></p>
                         <span th:classappend="${#strings.toLowerCase(project.status)}" class="tag" th:text="${project.status}">Pending</span>
-                    </div>
+                        </div>
+                        </div>
                 </div>
             </div>
         </section>
